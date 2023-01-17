@@ -1,0 +1,151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="{% static 'booking/fullcalendar-6.0.2/dist/index.global.min.js' %} "></script>
+
+	<!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ <link rel="stylesheet" href="{% static 'booking/toastr/toastr.min.css' %}">
+
+      <!-- <link rel="stylesheet" type="text/css" href="{% static 'booking/mdb.min.css' %}"> -->
+
+
+  <link rel="stylesheet" href="{% static 'booking/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'booking/fullcalendar/main.min.css' %}">
+  <link rel="stylesheet" href="{% static 'booking/fullcalendar-daygrid/main.min.css' %}">
+  <link rel="stylesheet" href="{% static 'booking/fullcalendar-timegrid/main.min.css' %}">
+  <link rel="stylesheet" href="{% static 'booking/fullcalendar-bootstrap/main.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'booking/dist/css/adminlte.min.css' %}">
+  <!-- Google Font: Source Sans Pro -->
+  <!-- <link href="https:/fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet"> -->
+
+  <link rel="stylesheet" type="text/css" href="{% static 'booking/main.css' %}">
+
+ 
+  
+
+  <link rel="stylesheet" type="text/css" href="{% static 'booking/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'booking/bootstrap-datepicker/css/bootstrap-datepicker.standalone.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'booking/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css' %}">
+
+
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'booking/fontawesome-free/css/all.min.css' %}">
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'booking/daterangepicker/daterangepicker.css' %}"> 
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'booking/icheck-bootstrap/icheck-bootstrap.min.css' %}">  
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="{% static 'booking/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">  
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'booking/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">  
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'booking/select2/css/select2.min.css' %}">
+  <link rel="stylesheet" href="{% static 'booking/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">  
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="{% static 'booking/bootstrap4-duallistbox/bootstrap-duallistbox.min.css' %}"> 
+
+
+	{% block head %}{% endblock %}
+</head>
+<body>
+
+	<header class="site-header">
+		<nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+			<div class="container">
+				<a class="navbar-brand mr-4" href="{% url 'booking-home' %}">MBL | Room Booking</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarToggle">
+					<div class="navbar-nav mr-auto">
+						<!--<a class="nav-item nav-link" href="{% url 'booking-home' %}">Home</a> -->
+					</div>
+					<!-- Navbar Right Side -->
+					<div class="navbar-nav">
+						{% if user.is_authenticated %}
+						<a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+						<a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
+						{% else %}
+						<a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+						<a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</nav>
+	</header>
+
+	<main role="main" class="container">
+	  <div class="row">
+	    <div class="col-md-12">
+	      {% if messages %}
+	      	{% for message in messages%}
+	      		<div class="alert alert-{{ message.tags }}">
+	      			{{ message }}
+	      		</div>
+	      	{% endfor %}
+	      {% endif %}
+	      {% block content %}{% endblock %}
+	    </div>
+	    
+	  </div>
+	</main>
+
+	<!-- jQuery -->
+	<script src="{% static 'booking/jquery/jquery-3.6.3.min.js' %}"></script>
+	<!-- Bootstrap -->
+	<script src="{% static 'booking/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+	<!-- jQuery UI -->
+	<script src="{% static 'booking/jquery-ui/jquery-ui.min.js' %} "></script>
+	<!-- AdminLTE App -->
+	<script src="{% static 'booking/dist/js/adminlte.min.js' %} "></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="{% static 'booking/dist/js/demo.js' %} "></script>
+	<!-- fullCalendar 2.2.5 -->
+	<script src="{% static 'booking/moment/moment.min.js' %} "></script>
+	<script src="{% static 'booking/fullcalendar/main.min.js' %} "></script>
+	<script src="{% static 'booking/fullcalendar-daygrid/main.min.js' %} "></script>
+	<script src="{% static 'booking/fullcalendar-timegrid/main.min.js' %} "></script>
+	<script src="{% static 'booking/fullcalendar-interaction/main.min.js' %} "></script>
+	<script src="{% static 'booking/fullcalendar-bootstrap/main.min.js' %} "></script>
+
+
+
+	<script src="{% static 'booking/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %} "></script>
+
+	<!-- jQuery -->
+	<!-- <script src="{% static 'booking/jquery/jquery.min.js' %} "></script> -->
+	<!-- Bootstrap 4 -->
+	<script src="{% static 'booking/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+	<!-- Select2 -->
+	<script src="{% static 'booking/select2/js/select2.full.min.js' %} "></script>
+	<!-- Bootstrap4 Duallistbox -->
+	<script src="{% static 'booking/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js' %} "></script>
+	<!-- date-range-picker -->
+	<script src="{% static 'booking/daterangepicker/daterangepicker.js' %} "></script>
+	<!-- bootstrap color picker -->
+	<script src="{% static 'booking/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %} "></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script src="{% static 'booking/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %} "></script>
+	<!-- AdminLTE App -->
+	<script src="{% static 'booking/dist/js/adminlte.min.js' %} "></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="{% static 'booking/dist/js/demo.js' %} "></script>
+
+	<script src="{% static 'booking/toastr/toastr.min.js' %} "></script>
+ 
+<!-- Page specific script -->
+
+{% block script_content %}
+{% endblock %}
+
+</body>
+</html>
+

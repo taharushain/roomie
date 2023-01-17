@@ -1,0 +1,80 @@
+
+<style>
+	.card-header {
+  height: 50vh !important;  
+}
+
+.card-header-image {
+  height: 35vh !important; 
+
+}
+</style>
+
+{% extends "booking/base.html" %}
+
+{% block head %}
+	{% if title%}
+		<title>booking | {{ title }}</title>
+	{% else %}
+		<title>booking | Home</title>
+	{% endif %}
+{% endblock head %}
+
+{% block content %}
+
+<div class="bg-white border rounded-5">
+	{% for room in rooms %}
+
+	{% if forloop.first %}<div class="row row-eq-height">{% endif %}
+    
+      <section class="p-4 d-flex justify-content-center col-md-4">
+        <div class="card w-100 ">
+          <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+            <img src="{{ room.image.url }}" class="img-fluid w-100 card-header-image" alt="{{ room.title }}">
+            <a href="{% url 'room_details' room.id %}">
+              <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+            </a>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ room.title }}</h5>
+            <p class="card-text">
+             
+            </p>
+            <a href="{% url 'room_details' room.id %}" class="btn btn-dark">BOOK</a>
+          </div>
+        </div>
+      </section>
+      
+  
+    {% if forloop.counter|divisibleby:3 %}</div><div class="row">{% endif %}
+    {% if forloop.last %}</div>{% endif %}
+
+		
+	{% endfor %}
+
+ </div>
+
+
+	{% if is_paginated %}
+		
+		{% if page_obj.has_previous %}
+			<a href="?page=1" class="btn btn-outline-info mb-4">First</a>
+			<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+		{% endif %}
+
+		{% for num in page_obj.paginator.page_range %}
+			{% if page_obj.number == num %}
+				<a href="?page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+			{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+				<a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{num}}</a>
+			{% endif %}
+		{% endfor %}
+
+		{% if page_obj.has_next %}
+			<a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+			<a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+		{% endif %}
+
+	{% endif %}
+
+{% endblock content %}

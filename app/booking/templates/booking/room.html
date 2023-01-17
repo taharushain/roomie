@@ -1,0 +1,1272 @@
+{% extends "booking/base.html" %}
+{% load static %}
+
+{% block head %}
+{% if title%}
+<title>booking | {{ title }}</title>
+{% else %}
+<title>booking | Home</title>
+{% endif %}
+{% endblock head %}
+
+{% block content %}
+
+<style>
+
+#calendar .fc-today {
+    background: #95afc0 !important;
+}
+
+.fc-title{
+    font-size: 1.1em;
+}
+</style>
+
+<!-- Main content -->
+<section class="content">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="sticky-top mb-3">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">{{room}}</h4>
+						</div>
+						<div class="card-body">
+							<!-- the events -->
+							<div id="external-events">
+
+							</div>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">Set Event</h3>
+						</div>
+						<div class="card-body">
+						<!--	<div class="btn-group" style="width: 100%; margin-bottom: 10px;">
+							
+								<ul class="fc-color-picker" id="color-chooser">
+									<li><a class="text-primary" href="#"><i class="fas fa-square"></i></a></li>
+									<li><a class="text-warning" href="#"><i class="fas fa-square"></i></a></li>
+									<li><a class="text-success" href="#"><i class="fas fa-square"></i></a></li>
+									<li><a class="text-danger" href="#"><i class="fas fa-square"></i></a></li>
+									<li><a class="text-muted" href="#"><i class="fas fa-square"></i></a></li>
+								</ul>
+							</div> -->
+							<!-- /btn-group -->
+							<div class="input-group">
+								<input id="new-event" type="text" class="form-control" placeholder="Event Title">
+
+								<div class="input-group-append">
+									<button id="add-new-event" type="button" class="btn btn-primary">Add</button>
+								</div>
+								<!-- /btn-group -->
+							</div>
+							<!-- /input-group -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.col -->
+			<div class="col-md-9">
+				<div class="card card-primary">
+					<div class="card-body p-0">
+						<!-- THE CALENDAR -->
+						<div id="calendar"></div>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<!-- /.row -->
+	</div><!-- /.container-fluid -->
+</section>
+
+
+
+
+
+
+<div class="modal fade" id="event-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Create Event</h3>
+					</div>
+					<div class="card-body">
+
+						<!-- /btn-group -->
+						<div class="input-group">
+
+							<form name="save-event" method="post" onsubmit='return false'>
+								{% csrf_token %}
+								<div class="form-group">
+									<label>Title</label>
+									<input type="text" name="title" class="form-control" />
+								</div>
+								<div class="form-group">
+									<label>Event start</label>
+									<input type="date" name="evtStart" class="form-control col-xs-3" />
+								</div>
+							
+
+								 <!-- time Picker -->
+					                <div class="bootstrap-timepicker">
+					                  <div class="form-group">
+					                    <label>Start Time:</label>
+
+					                    <div class="input-group date" id="timepicker-create-event-start" data-target-input="nearest">
+					                      <input type="text" class="form-control datetimepicker-input" data-target="#timepicker-create-event-start" name="start_time"/>
+					                      <div class="input-group-append" data-target="#timepicker-create-event-start" data-toggle="datetimepicker">
+					                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+					                      </div>
+					                      </div>
+					                    <!-- /.input group -->
+					                  </div>
+					                  <!-- /.form group -->
+					                </div>
+
+
+ 					                <div class="bootstrap-timepicker">
+					                  <div class="form-group">
+					                    <label>End Time:</label>
+
+					                    <div class="input-group date" id="timepicker-create-event-end" data-target-input="nearest">
+					                      <input type="text" class="form-control datetimepicker-input" data-target="#timepicker-create-event-end" name="end_time"/>
+					                      <div class="input-group-append" data-target="#timepicker-create-event-end" data-toggle="datetimepicker">
+					                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+					                      </div>
+					                      </div>
+					                    <!-- /.input group -->
+					                  </div>
+					                  <!-- /.form group -->
+					                </div>
+					
+						  <div class="form-group">
+                  	      <div class="checkbox">
+                            <label><input type="checkbox" id="chk_recur" value='0' />  Is Recurring event</label>
+                        </div>
+                			    </div>
+
+					               <!-- <div class="form-group">
+						                <label>Color:</label>
+						                <input type="text" class="form-control my-colorpicker1" name='colorpicker1'>
+						              </div> -->
+
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+									<button type="submit" class="btn btn-primary" >Save changes</button>
+								</div>
+
+							</form>
+
+							<!-- /btn-group -->
+						</div>
+						<!-- /input-group -->
+					</div>
+				</div>
+
+
+
+			</div>
+
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="event-modal-update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Set Event</h3>
+					</div>
+					<div class="card-body">
+
+						<!-- /btn-group -->
+						<div class="input-group">
+
+							<form name="update-event" method="post" onsubmit='return false'>
+								{% csrf_token %}
+								<div class="form-group">
+									<label>Title</label>
+									<input type="text" name="title" class="form-control" />
+								</div>
+								<div class="form-group">
+									<label>Event start</label>
+									<input type="date" name="evtStart" class="form-control col-xs-3" />
+								</div>
+							
+
+								 <!-- time Picker -->
+					                <div class="bootstrap-timepicker">
+					                  <div class="form-group">
+					                    <label>Start Time:</label>
+
+					                    <div class="input-group date" id="timepicker-update-event-start" data-target-input="nearest">
+					                      <input type="text" class="form-control datetimepicker-input" data-target="#timepicker-update-event-start" name="start_time"/>
+					                      <div class="input-group-append" data-target="#timepicker-update-event-start" data-toggle="datetimepicker">
+					                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+					                      </div>
+					                      </div>
+					                    <!-- /.input group -->
+					                  </div>
+					                  <!-- /.form group -->
+					                </div>
+
+
+ 					                <div class="bootstrap-timepicker">
+					                  <div class="form-group">
+					                    <label>End Time:</label>
+
+					                    <div class="input-group date" id="timepicker-update-event-end" data-target-input="nearest">
+					                      <input type="text" class="form-control datetimepicker-input" data-target="#timepicker-update-event-end" name="end_time"/>
+					                      <div class="input-group-append" data-target="#timepicker-update-event-end" data-toggle="datetimepicker">
+					                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+					                      </div>
+					                      </div>
+					                    <!-- /.input group -->
+					                  </div>
+					                  <!-- /.form group -->
+					                </div>
+
+					                <div class="form-group">
+                  	      <div class="checkbox">
+                            <label><input type="checkbox" id="chk_recur" value='0' />  Is Recurring event</label>
+                        </div>
+                			    </div>
+
+					              <!--  <div class="form-group">
+						                <label>Color:</label>
+						                <input type="text" class="form-control my-colorpicker1" name='colorpicker1'>
+						              </div> -->
+
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+									<button type="submit" class="btn btn-primary" >Save changes</button>
+								</div>
+
+							</form>
+
+							<!-- /btn-group -->
+						</div>
+						<!-- /input-group -->
+
+						<hr>
+						<form name="delete-event" method="post" onsubmit='return false'>
+						<button type="submit" class="btn btn-danger">Delete Event</button>
+						</form>
+
+					</div>
+				</div>
+
+
+
+			</div>
+
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+{% endblock content %}
+
+
+
+{% block script_content %}
+
+<script>
+
+/*
+      $(document).Toasts('create', {
+        title: 'Toast Title',
+        autohide: true,
+        delay: 1750,
+        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+      })
+*/
+
+
+function add_new_meeting(calender, meeting){
+
+	isRecur = meeting.isrecurring;
+	d = {};
+
+	if (isRecur=='True') {
+
+	    d = {
+		id 			 : meeting.id,
+		title          : meeting.title,
+		startTime: new Date(meeting.start).toTimeString().substring(0,8),
+      	endTime: new Date(meeting.end).toTimeString().substring(0,8),
+          backgroundColor: meeting.backgroundColor, //red
+          borderColor    : meeting.borderColor, //red
+          allDay         : meeting.allDay,
+          daysOfWeek      : [new Date(meeting.start).getDay().toString()]
+      };
+
+	}else{
+	d = {
+		id 			 : meeting.id,
+		title          : meeting.title,
+		start          : new Date( meeting.start),
+		end 			 : new Date(meeting.end),
+          backgroundColor: meeting.backgroundColor, //red
+          borderColor    : meeting.borderColor, //red
+          allDay         : meeting.allDay,
+       
+      };
+    }
+
+    //calendar.addEvent(d);
+    $('#calendar').fullCalendar('renderEvent', d);
+
+      users[meeting.id] = {
+      	'name'		 : meeting.user.user.username,
+		'department'		 : meeting.user.department,
+		'ip_phone'		 : meeting.user.ip_phone,
+		'user_id': meeting.user.id,	
+		'first_name': meeting.user.user.first_name,	
+		'last_name': meeting.user.user.last_name,		
+      };
+
+}
+
+
+function parseColor(color) {
+    var arr=[]; color.replace(/[\d+\.]+/g, function(v) { arr.push(parseFloat(v)); });
+    return {
+        hex: "#" + arr.slice(0, 3).map(toHex).join(""),
+        opacity: arr.length == 4 ? arr[3] : 1
+    };
+}
+function toHex(int) {
+    var hex = int.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+
+	//Colorpicker
+    //$('.my-colorpicker1').colorpicker();
+    //color picker with addon
+    //$('.my-colorpicker2').colorpicker();
+
+	//Timepicker
+    $('#timepicker-create-event-start').datetimepicker({
+      format: 'LT',
+    stepping : 15
+    });
+
+
+
+	//Timepicker
+    $('#timepicker-create-event-end').datetimepicker({
+      format: 'LT',
+      stepping : 15
+    });
+
+    //Timepicker
+    $('#timepicker-update-event-start').datetimepicker({
+      format: 'LT',
+      stepping : 15
+    });
+
+
+	//Timepicker
+    $('#timepicker-update-event-end').datetimepicker({
+      format: 'LT',
+      stepping : 15
+    });
+
+	meets = []
+	users = {}
+
+	{% for meeting in meetings.all %}
+
+	isRecur = '{{meeting.isrecurring}}'
+	d = {}
+
+	if (isRecur=='True') {
+		//new Date('{{ meeting.start|date:"D, d M Y H:i:s" }}').getTime()
+
+	    d = {
+		id 			 : '{{meeting.id}}',
+		title          : '{{meeting.title}}',
+		startTime: new Date('{{ meeting.start|date:"D, d M Y H:i:s" }}').toTimeString().substring(0,8),
+      	endTime: new Date('{{ meeting.end|date:"D, d M Y H:i:s" }}').toTimeString().substring(0,8),
+          backgroundColor: '{{meeting.backgroundColor}}', //red
+          borderColor    : '{{meeting.borderColor}}', //red
+          allDay         : '{{meeting.allDay}}',
+          daysOfWeek      : [new Date('{{ meeting.start|date:"D, d M Y H:i:s" }}').getDay().toString()]
+      };
+	}else{
+	d = {
+		id 			 : '{{meeting.id}}',
+		title          : '{{meeting.title}}',
+		start          : new Date('{{ meeting.start|date:"D, d M Y H:i:s" }}'),
+		end 			 : new Date('{{ meeting.end|date:"D, d M Y H:i:s" }}'),
+          backgroundColor: '{{meeting.backgroundColor}}', //red
+          borderColor    : '{{meeting.borderColor}}', //red
+          allDay         : '{{meeting.allDay}}',
+       
+      };
+    }
+      meets.push(d);
+
+      users['{{meeting.id}}'] = {
+      	'name'		 : '{{meeting.user.user.username}}',
+		'department'		 : '{{meeting.user.department}}',
+		'ip_phone'		 : '{{meeting.user.ip_phone}}',	
+		'user_id': '{{meeting.user.id}}',
+		'first_name': '{{meeting.user.user.first_name}}',	
+		'last_name': '{{meeting.user.user.last_name}}',		
+      }
+
+      {% endfor %}
+  </script>
+
+
+
+  <script>
+  	obj = 0;
+  	$(function () {
+
+
+  		function getCookie(name) {
+  			var cookieValue = null;
+  			if (document.cookie && document.cookie != '') {
+  				var cookies = document.cookie.split(';');
+  				for (var i = 0; i < cookies.length; i++) {
+  					var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                	cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                	break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    /* initialize the external events
+    -----------------------------------------------------------------*/
+    function ini_events(ele) {
+    	ele.each(function () {
+
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var eventObject = {
+          title: $.trim($(this).text()) // use the element's text as the event title
+      }
+
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject)
+
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+        	zIndex        : 1070,
+          revert        : true, // will cause the event to go back to its
+          revertDuration: 0,  //  original position after the drag
+          //drag: function( event, ui ) {console.log(event)}
+      });
+
+        
+
+    })
+    }
+
+    ini_events($('#external-events div.external-event'))
+
+    /* initialize the calendar
+    -----------------------------------------------------------------*/
+    //Date for the calendar events (dummy data)
+    var date = new Date()
+    var d    = date.getDate(),
+    m    = date.getMonth(),
+    y    = date.getFullYear()
+
+    var Calendar = FullCalendar.Calendar;
+    var Draggable = FullCalendarInteraction.Draggable;
+
+    var containerEl = document.getElementById('external-events');
+    var checkbox = document.getElementById('drop-remove');
+    var calendarEl = document.getElementById('calendar');
+
+    // initialize the external events
+    // -----------------------------------------------------------------
+
+    new Draggable(containerEl, {
+    	itemSelector: '.external-event',
+    	eventData: function(eventEl) {
+
+    		return {
+    			title: eventEl.innerText,
+    			backgroundColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+    			borderColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+    			textColor: window.getComputedStyle( eventEl ,null).getPropertyValue('color'),
+    		};
+    	}
+    });
+
+    var calendar = new Calendar(calendarEl, {
+    	plugins: [ 'bootstrap', 'interaction',  'timeGrid' ],
+    	initialView: 'timeGridWeek',
+    	header    : {
+    		left  : 'prev,next today',
+    		center: 'title',
+    		right : 'timeGridWeek,timeGridDay'
+    	},
+    	'themeSystem': 'bootstrap',
+      //Random default events
+      events    : meets,
+      editable  : true,
+      droppable : true, // this allows things to be dropped onto the calendar !!!
+      allDaySlot: false,
+      minTime: "09:00:00",
+      maxTime: "20:00:00",
+      eventOverlap: false,
+      selectOverlap: false,
+      activeStart: Date(),
+      slotEventOverlap: false,
+      drop      : function(info) {
+        // is the "remove after drop" checkbox checked?
+        //if (checkbox.checked) {
+          // if so, remove the element from the "Draggable Events" list
+          info.draggedEl.parentNode.removeChild(info.draggedEl);
+        //}
+    },
+
+
+    /*eventMouseEnter: function(info){
+    	//console.log(users[info.event.id]);
+    	var department = users[info.event.id].department.toString();
+    	var title = info.event.title.toString();
+    	var ip_phone = users[info.event.id].ip_phone.toString();
+    	var name = users[info.event.id].first_name.toString() + ' ' + users[info.event.id].last_name.toString();
+
+    	var msg = 'Title :'+ title +' <br/>'
+    				+ 'By :'+ name + ' <br/>' 
+    				+ 'Department :'+ department + ' <br/>' 
+    				+ 'IP :'+ ip_phone + '';
+
+    	//console.log(msg);
+    	$(info.el).attr('data-html', 'true');
+    	$(info.el).tooltip({title: msg}); 
+    },*/
+
+
+    eventClick: function (info) {
+    	i = 0;
+    	//console.log(id);
+    	//console.log(users[info.event.id].user_id);
+		var id = '{{ request.user.profile.id }}';
+    	if(id != users[info.event.id].user_id.toString()){
+    		return;
+    	}
+        // set values in inputs
+        obj_str = info.event.start
+        obj_end = info.event.end
+        //console.log(obj_str);
+        //console.log(obj_end);
+        //console.log(info.event._def.recurringDef);
+        //console.log(Object.hasOwn(info.event._def, 'recurringDef'));
+
+        chk_recur = 0;
+
+        //console.log(info.event);
+
+        $('#event-modal-update').find('input[id=chk_recur]').val(
+            info.event.title.toString()
+        );
+
+        $('#event-modal-update').find('input[name=title]').val(
+            info.event.title.toString()
+        );
+        $('#event-modal-update').find('input[name=evtStart]').val(
+            //start.format('YYYY-MM-DD HH:mm:ss')            
+            new Date(obj_str.getTime() - (obj_str.getTimezoneOffset() * 60000)).toISOString().split('T')[0]
+            );
+
+
+        //if(Object.hasOwn(info.event._def, 'recurringDef')){
+		//	$('#event-modal-update').find('input[id=chk_recur]').prop('checked', true);
+        //}else{
+        //	$('#event-modal-update').find('input[id=chk_recur]').prop('checked', false);
+        //}
+        //console.log(info.event._def.recurringDef);
+        if (typeof info.event._def.recurringDef == 'undefined'){
+        	$('#event-modal-update').find('input[id=chk_recur]').prop('checked', false);
+        }else{
+        	$('#event-modal-update').find('input[id=chk_recur]').prop('checked', true);
+        }
+        
+        
+        //console.log(obj.toString())
+        $('#event-modal-update').find('input[name=start_time]').val(
+            //end.toString()
+            //new Date(obj.getTime() - (obj.getTimezoneOffset() * 60000)).toISOString().split('T')[1]
+            obj_str.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+            );
+        
+		$('#event-modal-update').find('input[name=end_time]').val(
+            obj_end.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+            );
+
+		//$('#event-modal-update').find('input[name=colorpicker1]').val(parseColor(info.event.backgroundColor).hex);
+		//$('#event-modal-update').find('input[name=colorpicker1]').trigger('change');
+
+        // show modal dialog
+        $('#event-modal-update').modal('show');
+        
+        /*
+        bind event submit. Will perform a ajax call in order to save the event to the database.
+        When save is successful, close modal dialog and refresh fullcalendar.
+        */
+
+        
+        $("#event-modal-update").find('form[name=delete-event]').on('submit', function() {
+        	
+        	var postdata = {
+        		'id': info.event.id,
+        		'csrfmiddlewaretoken': '{{ csrf_token }}'
+        	};
+
+
+
+        	$.ajax({
+        		url: "{% url 'room_delete' room_id=room.id %}",
+        		data: postdata,
+        		type: 'post',
+        		dataType: 'json',
+        		success: function(response) {
+                    // if saved, close modal
+                    $("#event-modal-update").modal('hide');
+                    
+                    // refetch event source, so event will be showen in calendar
+                    //$("#calendar").fullCalendar( 'refetchEvents' );
+					info.event.remove();
+                    location.reload(true);
+                }
+            });
+        });
+		
+        
+        $("#event-modal-update").find('form[name=update-event]').on('submit', function() {
+
+        	var title = $('#event-modal-update').find('input[name=title]').val();
+        	var evtStart = $('#event-modal-update').find('input[name=evtStart]').val();
+        	var start_time = $('#event-modal-update').find('input[name=start_time]').val();
+        	var end_time = $('#event-modal-update').find('input[name=end_time]').val();
+
+        	//var color = $('#event-modal-update').find('input[name=colorpicker1]').val();
+
+        	var isRecur = $('#event-modal-update').find('input[id=chk_recur]').prop('checked');
+
+
+        	//a  = parseInt(color.substring(1,3), 16)
+			//b  = parseInt(color.substring(3,5), 16)
+			//c  = parseInt(color.substring(5,8), 16)
+
+
+
+			//res_color = 'rgb('.concat(a, ',', b, ',' , c, ')');
+
+        	var postdata = {
+        		'id': info.event.id,
+        		'title': title,
+        		'start': Date.parse(evtStart + ' '+start_time),
+        		'end': Date.parse(evtStart + ' '+end_time),
+        		'color': 'rgb(60, 141, 188)',
+        		'isRecur': isRecur,
+        		'backgroundColor': 'rgb(60, 141, 188)',
+    			'borderColor': 'rgb(60, 141, 188)',
+        		'csrfmiddlewaretoken': '{{ csrf_token }}'
+        	};
+
+        	$.ajax({
+        		url: "{% url 'room_update' room_id=room.id %}",
+        		data: postdata,
+        		type: 'post',
+        		dataType: 'json',
+        		success: function(response) {
+                    $("#event-modal-update").modal('hide');
+                    				
+                    location.reload(true);
+                },
+                beforeSend: function() {
+                	i++;
+                	startMoment = moment(evtStart + ' '+start_time);
+                	endMoment = moment(evtStart + ' '+end_time);
+                	if(i!=1) {
+                		$("#event-modal").modal('hide');
+                    	$("#event-modal-update").modal('hide');
+                		return false;
+                	}
+
+                	event_id = -1
+                	if (typeof info.event != 'undefined')
+                		event_id = info.event.id
+
+                	//console.log(isAnOverlapEvent(meets, startMoment, endMoment, event_id))
+                	//return false;
+
+
+                	if(isAnOverlapEvent(meets, startMoment, endMoment, event_id)){
+                		$("#event-modal").modal('hide');
+                    	$("#event-modal-update").modal('hide');
+                		alert('Event can not be created due to an overlap');
+                		return false;
+                	}else if(!isResonableEvent(startMoment, endMoment)){
+                		$("#event-modal").modal('hide');
+                    	$("#event-modal-update").modal('hide');
+                		alert('Specified duration is in past or incorrect');
+                		return false;
+                	}
+                	else{
+                		return true;
+                	}
+			      
+			  }
+            });
+        });
+    },
+
+    eventDrop: function(info) {
+    	var id = '{{ request.user.profile.id }}';
+    	if(id != users[info.event.id].user_id.toString()){
+    		location.reload(true);
+    		return;
+    	}
+    	
+    	obj = info.event;
+
+    	isRecur = 'false';
+    	if (typeof info.event._def.recurringDef == 'undefined'){
+        	isRecur = 'false';
+        }else{
+        	isRecur = 'true';
+        }
+    	
+    	var postdata = {
+    		'id': info.event.id,
+    		'title': info.event.title,
+    		'start': info.event.start.getTime() / 1000,
+    		'end': info.event.end ? info.event.end.getTime() / 1000 :  Date.now(),
+    		'isRecur': isRecur,
+    		'backgroundColor': info.event.backgroundColor,
+    		'borderColor': info.event.borderColor,
+    		'csrfmiddlewaretoken': '{{ csrf_token }}'
+    	};
+
+    	$.ajax({
+    		type: "POST",
+    		url: "{% url 'room_update' room_id=room.id %}",
+    		data: postdata,
+    		success: function(res){
+			  	//info.event.db_id = res.id;
+            	//obj = info.event;
+            	//obj._calendar.removeAllEventSources();
+            	//obj._calendar.refetchEvents();	
+            	location.reload(true);	  				  	
+            },
+            beforeSend: function() {
+            	startMoment = moment(info.event.start.getTime());
+            	endMoment = moment(info.event.end.getTime());
+            	
+            	event_id = -1
+            	if (typeof info.event != 'undefined')
+            		event_id = info.event.id
+            	
+
+            	if(isAnOverlapEvent(meets, startMoment, endMoment, event_id)){
+            		$("#event-modal").modal('hide');
+                	$("#event-modal-update").modal('hide');
+                	//console.log('here');
+            		alert('Event can not be created due to an overlap');
+            		//location.reload(true);
+            		return false;
+            	}else if(!isResonableEvent(startMoment, endMoment)){
+            		$("#event-modal").modal('hide');
+                	$("#event-modal-update").modal('hide');
+            		alert('Specified duration is in past or incorrect');
+            		location.reload(true);
+            		return false;
+            	}
+            	else{
+            		return true;
+            	}
+		      
+		  },            
+            dataType: null
+        });
+    },
+
+
+    // Drag and Drop from Sidebar
+    eventReceive: function(info) {
+    	
+		    //alert(info.event.title + " end is now " + info.event.start.toString());
+
+		    //if (!confirm("drop Are you sure about this change?")) {
+		      //info.revert();
+
+		      var postdata = {
+		    	//'id': info.event.id,
+		    	'title': info.event.title,
+		    	'start': info.event.start.getTime() / 1000,
+		    	'end': info.event.end ? info.event.end.getTime() / 1000 :  Date.now(),
+		    	'allDay': info.event.allDay,
+		    	'backgroundColor': info.event.backgroundColor,
+		    	'borderColor': info.event.borderColor,
+		    	'csrfmiddlewaretoken': '{{ csrf_token }}'
+		    };
+
+		    $.ajax({
+		    	type: "POST",
+		    	url: "{% url 'room_update' room_id=room.id %}",
+		    	data: postdata,
+		    	success: function(res){
+				  	//info.event.db_id = res.id;
+	            	//obj = info.event;
+	            	//obj._calendar.removeAllEventSources();
+	            	//obj._calendar.refetchEvents();	
+	            	location.reload(true);	  	
+	            },
+	            beforeSend: function() {
+		            	startMoment = moment(evtStart + ' '+start_time);
+		            	endMoment = moment(evtStart + ' '+end_time);
+		            	
+		            	event_id = -1
+		            	if (typeof info.event != 'undefined')
+		            		event_id = info.event.id
+
+		            	if(isAnOverlapEvent(meets, startMoment, endMoment, event_id)){
+		            		$("#event-modal").modal('hide');
+		                	$("#event-modal-update").modal('hide');
+		            		alert('Event can not be created due to an overlap');
+		            		return false;
+		            	}else if(!isResonableEvent(startMoment, endMoment)){
+		            		$("#event-modal").modal('hide');
+		                	$("#event-modal-update").modal('hide');
+		            		alert('Specified duration is in past or incorrect');
+		            		return false;
+		            	}
+		            	else{
+		            		return true;
+		            	}
+				      
+			  },            
+
+            dataType: null
+        });
+
+
+    	//}
+    },
+
+    eventRender: function(info) {
+        var department = users[info.event.id].department.toString();
+    	var title = info.event.title.toString();
+    	var ip_phone = users[info.event.id].ip_phone.toString();
+    	var name = users[info.event.id].first_name.toString() + ' ' + users[info.event.id].last_name.toString();
+
+    	var msg = 'Title :'+ title +' <br/>'
+    				+ 'By :'+ name + ' <br/>' 
+    				+ 'Department :'+ department + ' <br/>' 
+    				+ 'IP :'+ ip_phone + '';
+
+    	//console.log(msg);
+    	//$(info.el).attr('data-html', 'true');
+    	//$(info.el).tooltip({title: msg}); 
+    	if (!info.isMirror) {
+	        $(info.el).tooltip({  
+	          html: true,
+	          title: msg,
+	          placement: "bottom",
+	          trigger: "hover",
+	          container: "body"
+	        });    	
+      	}
+    },
+
+    eventResize: function(info) {
+    	//console.log(info);
+    	var id = '{{ request.user.profile.id }}';
+    	if(id != users[info.event.id].user_id.toString()){
+    		location.reload(true);
+    		return;
+    	}
+
+    	isRecur = 'false';
+    	if (typeof info.event._def.recurringDef == 'undefined'){
+        	isRecur = 'false';
+        }else{
+        	isRecur = 'true';
+        }
+
+    	var postdata = {
+    		'id': info.event.id,
+    		'title': info.event.title,
+    		'start': info.event.start.getTime() / 1000,
+    		'end': info.event.end ? info.event.end.getTime() / 1000 :  Date.now(),
+    		'isRecur': isRecur,
+    		'backgroundColor': info.event.backgroundColor,
+    		'borderColor': info.event.borderColor,
+    		'csrfmiddlewaretoken': '{{ csrf_token }}'
+    	};
+
+
+    	$.ajax({
+    		type: "POST",
+    		url: "{% url 'room_update' room_id=room.id %}",
+    		data: postdata,
+    		success: function(res){
+			  	//info.event.db_id = res.id;
+            	//obj = info.event;
+            	//obj._calendar.removeAllEventSources();
+            	//obj._calendar.refetchEvents();	
+            	location.reload(true);	  	
+            },
+            beforeSend: function() {
+	            	startMoment = moment(info.event.start);
+	            	endMoment = moment(info.event.end);
+	            	
+	            	event_id = -1
+	            	if (typeof info.event != 'undefined')
+	            		event_id = info.event.id
+
+	            	if(isAnOverlapEvent(meets, startMoment, endMoment, event_id)){
+	            		$("#event-modal").modal('hide');
+	                	$("#event-modal-update").modal('hide');
+	            		alert('Event can not be created due to an overlap');
+	            		return false;
+	            	}else if(!isResonableEvent(startMoment, endMoment)){
+	            		$("#event-modal").modal('hide');
+	                	$("#event-modal-update").modal('hide');
+	            		alert('Specified duration is in past or incorrect');
+	            		return false;
+	            	}
+	            	else{
+	            		return true;
+	            	}
+			      
+			  },            
+            dataType: null
+        });
+    },
+
+    // hawa
+    select: function( info ) {
+        // set values in inputs
+        i = 0;
+
+        $('#event-modal').find('input[name=evtStart]').val(
+            //start.format('YYYY-MM-DD HH:mm:ss')            
+            new Date(info.start.getTime() - (info.start.getTimezoneOffset() * 60000)).toISOString().split('T')[0]
+            );
+        
+        $('#event-modal').find('input[name=start_time]').val(
+            //end.toString()
+            //new Date(obj.getTime() - (obj.getTimezoneOffset() * 60000)).toISOString().split('T')[1]
+            info.start.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+            );
+        
+		$('#event-modal').find('input[name=end_time]').val(
+            //end.toString()
+            //new Date(obj.getTime() - (obj.getTimezoneOffset() * 60000)).toISOString().split('T')[1]
+            info.end.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+            );
+
+		//$('#event-modal').find('input[name=colorpicker1]').val('#3c8dbc');
+		//$('#event-modal').find('input[name=colorpicker1]').trigger('change');
+		
+		$('#event-modal').find('input[name=end_time]').val(
+            //end.toString()
+            //new Date(obj.getTime() - (obj.getTimezoneOffset() * 60000)).toISOString().split('T')[1]
+            info.end.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+            );
+            
+        $('#event-modal').find('input[id=chk_recur]').prop('checked', false);
+        
+        // show modal dialog
+        $('#event-modal').modal('show');
+
+        $('#event-modal').find('input[name=title]').val(
+            ''
+        );
+        
+        /*
+        bind event submit. Will perform a ajax call in order to save the event to the database.
+        When save is successful, close modal dialog and refresh fullcalendar.
+        */
+
+
+        
+        $("#event-modal").find('form[name=save-event]').on('submit', function() {
+
+        	var title = $('#event-modal').find('input[name=title]').val();
+        	var evtStart = $('#event-modal').find('input[name=evtStart]').val();
+        	var start_time = $('#event-modal').find('input[name=start_time]').val();
+        	var end_time = $('#event-modal').find('input[name=end_time]').val();
+
+        	//var color = $('#event-modal').find('input[name=colorpicker1]').val();
+
+
+        	//a  = parseInt(color.substring(1,3), 16)
+			//b  = parseInt(color.substring(3,5), 16)
+			//c  = parseInt(color.substring(5,8), 16)
+
+			//res_color = 'rgb('.concat(a, ',', b, ',' , c, ')');
+
+        	
+        	var postdata = {
+        		'title': title,
+        		'start': Date.parse(evtStart + ' '+start_time),
+        		'end': Date.parse(evtStart + ' '+end_time),
+        		'color': 'rgb(60, 141, 188)',
+        		'backgroundColor': 'rgb(60, 141, 188)',
+    			'borderColor': 'rgb(60, 141, 188)',
+        		'csrfmiddlewaretoken': '{{ csrf_token }}'
+        	};
+
+        	//console.log(postdata);
+
+        	$.ajax({
+        		url: "{% url 'room_update' room_id=room.id %}",
+        		data: postdata,
+        		type: 'post',
+        		dataType: 'json',
+        		//cache: false,
+        		success: function(response) {
+
+        			//event.preventDefault();
+        			//console.log(isAnOverlapEvent(meets, info.event));
+        			//alert();
+        			//return false;
+                    // if saved, close modal
+                    $("#event-modal").modal('hide');
+                    $("#event-modal-update").modal('hide');
+
+					location.reload(true);
+                    //add_new_meeting(calendar, response);
+
+
+                },
+                beforeSend: function() {
+                	i++;
+                	startMoment = moment(evtStart + ' '+start_time);
+                	endMoment = moment(evtStart + ' '+end_time);
+                	if(i!=1) {
+                		//console.log('false a');
+                		$("#event-modal").modal('hide');
+                    	$("#event-modal-update").modal('hide');
+                		return false;
+                	}
+
+                	event_id = -1
+	            	if (typeof info.event != 'undefined')
+	            		event_id = info.event.id
+
+                	if(isAnOverlapEvent(meets, startMoment, endMoment, event_id)){
+                		//console.log('false b');
+                		$("#event-modal").modal('hide');
+                    	$("#event-modal-update").modal('hide');
+                		alert('Event can not be created due to an overlap');
+
+                		return false;
+                	}else if(!isResonableEvent(startMoment, endMoment)){
+	            		$("#event-modal").modal('hide');
+	                	$("#event-modal-update").modal('hide');
+	            		alert('Specified duration is in past or incorrect');
+	            		return false;
+	            	}
+                	else{
+                		//console.log('true');
+                		return true;
+                	}
+			      
+			  }
+            });
+        });
+    },
+    selectHelper: true,
+    selectable: true,
+
+
+});
+
+calendar.render();
+    // $('#calendar').fullCalendar()
+
+    /* ADDING EVENTS */
+    var currColor = '#3c8dbc' //Red by default
+    //Color chooser button
+    var colorChooser = $('#color-chooser-btn')
+    $('#color-chooser > li > a').click(function (e) {
+    	e.preventDefault()
+      //Save color
+      currColor = $(this).css('color')
+      //Add color effect to button
+      $('#add-new-event').css({
+      	'background-color': currColor,
+      	'border-color'    : currColor
+      })
+    })
+
+
+    $('#add-new-event').click(function (e) {
+      e.preventDefault()
+      //Get value and make sure it is not null
+      var val = $('#new-event').val()
+      if (val.length == 0) {
+        return
+      }
+
+      //Create events
+      var event = $('<div />')
+      event.css({
+        'background-color': currColor,
+        'border-color'    : currColor,
+        'color'           : '#fff'
+      }).addClass('external-event')
+      event.html(val)
+      $('#external-events').prepend(event)
+
+      //Add draggable funtionality
+      ini_events(event)
+
+      //Remove event from text input
+      $('#new-event').val('')
+    })
+})
+</script>
+
+<script>
+//$(document).ready(function(){
+//  $('[data-toggle="tooltip"]').tooltip(trigger : 'hover')
+//});
+</script>
+
+
+<script>
+
+
+function isResonableEvent(startMoment, endMoment) {    
+    try {
+        if (moment.isMoment(startMoment) && moment.isMoment(endMoment)) {
+            // Filter Events by a specific resource
+            //const eventsByResource = events.filter(event => event.resourceId === resourceID);
+            
+            if (moment(startMoment).isBefore(moment()) 
+            	|| moment(endMoment).isBefore(moment())
+            	|| moment(endMoment).isSameOrBefore(moment(startMoment))
+            	) {
+                //console.log("event in past, or end before start")
+                return false;
+            }
+            
+            return true;
+        } else {
+            const error = 'Error, start or end are not Moment objects';
+            console.error(error);
+            throw new Error(error);
+        }
+    } catch (error) {
+
+        console.error(error);
+        throw error;
+    }
+}
+
+function isAnOverlapEvent(events, startMoment, endMoment, event_id) {
+
+	//console.log(events, startMoment, endMoment, event_id);
+
+	dow = startMoment.day();
+
+    try {
+        if (moment.isMoment(startMoment) && moment.isMoment(endMoment)) {
+            // Filter Events by a specific resource
+            // const eventsByResource = events.filter(event => event.resourceId === resourceID);
+            for (let i = 0; i < events.length; i++) {
+                const eventA = events[i];
+
+                eventStart = moment(eventA.start)
+                eventEnd = moment(eventA.end)
+
+                //console.log(eventStart, eventEnd);
+
+            	event_dow = -1
+				if (typeof eventA.daysOfWeek != 'undefined')
+					event_dow = eventA.daysOfWeek;
+
+				if(event_dow > 0 && event_dow == dow){
+					// recurring event
+					thedate =  moment(startMoment).format("YYYY-MM-DD")
+					eventStart = moment(thedate + ' ' + eventA.startTime);
+					eventEnd = moment(thedate + ' ' + eventA.endTime);
+				}
+
+				//console.log(eventStart, eventEnd);
+               
+                if(events[i].id == event_id) continue;
+                //console.log(events[i].id + '||' + event_id);
+
+                if (moment.isMoment(eventStart) && moment.isMoment(eventEnd)) {
+                    if (moment(startMoment).isAfter(eventStart) && moment(startMoment).isBefore(eventEnd)) {
+                        //console.log("start-time in between any of the events")
+                        return true;
+                    }
+                    if (moment(endMoment).isAfter(eventStart) && moment(endMoment).isBefore(eventEnd)) {
+                        //console.log("end-time in between any of the events")
+                        return true;
+                    }
+                    if (moment(startMoment).isSameOrBefore(eventStart) && moment(endMoment).isSameOrAfter(eventEnd)) {
+                        //console.log("any of the events in between/on the start-time and end-time")
+                        return true;
+                    }
+                } else {
+                    const error = 'Error, Any event on array of events is not valid. start or end are not Moment objects';
+                    console.error(error);
+                    throw new Error(error);
+                }
+            }
+            return false;
+        } else {
+            const error = 'Error, start or end are not Moment objects';
+            console.error(error);
+            throw new Error(error);
+        }
+    } catch (error) {
+
+        console.error(error);
+        throw error;
+    }
+}
+
+</script>
+
+{% endblock script_content %}
