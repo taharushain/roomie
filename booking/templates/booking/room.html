@@ -366,6 +366,19 @@ function add_new_meeting(calender, meeting){
 
 }
 
+function convertTo24Hour(time) {
+    var hours = Number(time.match(/^(\d+)/)[1]);
+		var minutes = Number(time.match(/:(\d+)/)[1]);
+		var AMPM = time.match(/\s(.*)$/)[1];
+		if(AMPM == "PM" && hours<12) hours = hours+12;
+		if(AMPM == "AM" && hours==12) hours = hours-12;
+		var sHours = hours.toString();
+		var sMinutes = minutes.toString();
+		if(hours<10) sHours = "0" + sHours;
+		if(minutes<10) sMinutes = "0" + sMinutes;
+		return sHours + ":" + sMinutes;
+}
+
 
 function parseColor(color) {
     var arr=[]; color.replace(/[\d+\.]+/g, function(v) { arr.push(parseFloat(v)); });
@@ -713,8 +726,8 @@ function toHex(int) {
         	var postdata = {
         		'id': info.event.id,
         		'title': title,
-        		'start': Date.parse(evtStart + ' '+start_time),
-        		'end': Date.parse(evtStart + ' '+end_time),
+        		'start': Date.parse(evtStart + 'T'+start_time),
+        		'end': Date.parse(evtStart + 'T'+end_time),
         		'color': 'rgb(60, 141, 188)',
         		'isRecur': isRecur,
         		'backgroundColor': 'rgb(60, 141, 188)',
@@ -1045,8 +1058,8 @@ function toHex(int) {
 
         	var title = $('#event-modal').find('input[name=title]').val();
         	var evtStart = $('#event-modal').find('input[name=evtStart]').val();
-        	var start_time = $('#event-modal').find('input[name=start_time]').val();
-        	var end_time = $('#event-modal').find('input[name=end_time]').val();
+        	var start_time = convertTo24Hour($('#event-modal').find('input[name=start_time]').val());
+        	var end_time = convertTo24Hour($('#event-modal').find('input[name=end_time]').val());
 
         	//var color = $('#event-modal').find('input[name=colorpicker1]').val();
 
@@ -1060,8 +1073,8 @@ function toHex(int) {
         	
         	var postdata = {
         		'title': title,
-        		'start': Date.parse(evtStart + ' '+start_time),
-        		'end': Date.parse(evtStart + ' '+end_time),
+        		'start': Date.parse(evtStart + 'T'+start_time),
+        		'end': Date.parse(evtStart + 'T'+end_time),
         		'color': 'rgb(60, 141, 188)',
         		'backgroundColor': 'rgb(60, 141, 188)',
     			'borderColor': 'rgb(60, 141, 188)',
